@@ -66,19 +66,22 @@ const romeveCut = (cut: any) =>
                         <BaseInput 
                             v-model:userInput="userStartCut" 
                             inputPlaceholder="1:30"
+                            :mode="mode"
                         />
                     </template>
 
                     <template #second>
                         <BaseInput 
                             v-model:userInput="userEndCut"
-                            inputPlaceholder="2:00" 
+                            inputPlaceholder="2:00"
+                            :mode="mode"
                         />
                     </template>
 
                     <template #btn>
                         <BaseButton
                             @click="takeUserCut()"
+                            :mode="mode"
                         >
                             Add Cut
                         </BaseButton>

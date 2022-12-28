@@ -1,13 +1,19 @@
-<script setup>
-defineProps({
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const prop = defineProps({
     userInput: {type: String},
     inputWidth: { type: String, default: '90px' },
     inputPlaceholder: { type: String, default: '1:30' },
     inputTextAlign: { type: String, default: 'center' },
     inputPadding: { type: String, default: '0px' },
     videoType: { type: Boolean, default: false },
+    mode: { type: Boolean, default: false },
 })
 defineEmits(['update:userInput'])
+
+// bind in css and in tag.
+const placeholderAndColorText = computed(() => prop.mode ? 'white' : '#5e5e5f')
 </script>
 
 <template>
@@ -18,11 +24,17 @@ defineEmits(['update:userInput'])
                     width: inputWidth, 
                     'border-top-right-radius': videoType ? '0' : '',
                     'border-bottom-right-radius': videoType ? '0' : '' }">
-                <input type="text" 
+                <input 
+                    type="text" 
                     :value="userInput"
                     @input="$emit('update:userInput', $event.target.value)"
                     :placeholder="inputPlaceholder"
-                    :style="{'text-align': inputTextAlign, padding: inputPadding}"
+                    :style="{
+                        color: placeholderAndColorText,
+                        background: mode ? 'black' : 'white',
+                        'text-align': inputTextAlign, 
+                        padding: inputPadding
+                    }"
                 />
             </div>
             <div class="video-type" v-if="videoType">
@@ -52,10 +64,12 @@ input {
     outline: none;
 
     font-size: 16px;
-    color: #5e5e5f;
 
     width: 100%;
     height: 100%;
+}
+::placeholder {
+    color: v-bind(placeholderAndColorText)
 }
 .video-type {
     display: flex;
