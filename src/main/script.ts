@@ -1,66 +1,52 @@
-import { ref } from 'vue'
 import loadIcon from '../components/icon/loadIcon.vue';
 import successIcon from '../components/icon/successIcon.vue';
 import errorIcon from '../components/icon/errorIcon.vue';
 
-const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-const inputTimeToSeconds = (time: any) => {
-  if (time.split(':').length == 3)
-      return (Number(time.split(':')[0] * 3600)) + Number(time.split(':')[1] * 60) + Number(time.split(':')[2]);
-  return (Number(time.split(':')[0] * 60)) + Number(time.split(':')[1])  
+const componentToShowResult = (result: any) => {
+  if ('loading' === result) return loadIcon;
+  else if ('success' === result) return successIcon;
+  else if ('error' === result) return errorIcon;
 }
 
-const iterableSeconds = (userCut: any) => {
+const ffmpegCutFormat = (cutInput: any) => {
+
+  const inputTimeToSeconds = (time: any) => {
+    if (time.split(':').length == 3)
+      return (Number(time.split(':')[0] * 3600)) + Number(time.split(':')[1] * 60) + Number(time.split(':')[2]);
+    return (Number(time.split(':')[0] * 60)) + Number(time.split(':')[1])  
+  }
+
+  const iterableSeconds = () => {
     const seconds: number[][] = []
     
-    userCut.forEach((v: any) => {
-        seconds.push( 
-            v.split('/').map((time: any) => {
-                // return (Number(time.split(':')[0] * 60)) + Number(time.split(':')[1])  
-                return inputTimeToSeconds(time)
-            })
-        )
+    cutInput.forEach((v: any) => {
+      seconds.push( 
+        v.split('/').map((time: any) => {
+          return inputTimeToSeconds(time)
+        })
+      )
     })
     return seconds
-}
+  }
 
-const generateCutFormat = (cut: any) => {
-    let result = ''
-    
+  const generateCutFormat = () => {
+    let timeFormat = ''
+    const cut: any = iterableSeconds()
+
     cut.forEach((time: any, index: any) => {
-        result += `between(t, ${time[0]}, ${time[1]})`
+      timeFormat += `between(t, ${time[0]}, ${time[1]})`
 
-        if (cut.length - 1 != index) result += '+'
+      if (cut.length - 1 != index) timeFormat += '+'
     })
-    return result
-}
 
-const editResult: any = ref(loadIcon)
-const generateFormat = (videoPath: any, cutInput: any, outputName: any) => {
+    return {
+      video: `select='${timeFormat}', setpts=N/FRAME_RATE/TB`, 
+      audio: `aselect='${timeFormat}', asetpts=N/SR/TB`
+    }
+  }
 
-  const ffmpegCutFormat =  generateCutFormat(iterableSeconds(cutInput)) 
-
-  const cutVideo = `select='${ffmpegCutFormat}', setpts=N/FRAME_RATE/TB`;
-  const cutAudio = `aselect='${ffmpegCutFormat}', asetpts=N/SR/TB`;
-
-  ffmpeg(videoPath)
-    .videoFilters(cutVideo)
-    .audioFilters(cutAudio)
-    .on("end", (err: any) => {
-      if (!err) {
-        editResult.value = successIcon;
-        console.log(`filter done`);
-      }
-    })
-    .on("error", (err: any) => {
-      editResult.value = errorIcon;
-      console.log("error:", err, "--------------------")
-    })
-    .save(outputName)
+  return generateCutFormat();
 
 }
 
-export { generateFormat, editResult }
+export { ffmpegCutFormat, componentToShowResult }

@@ -4,7 +4,9 @@ import BaseButton from "../components/BaseButton.vue"
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { generateFormat } from '../main/script' 
+
+import { ffmpegCutVideo } from '../main/cut' 
+import { ffmpegMergeVideo } from '../main/merge' 
 
 const { ipcRenderer } = require('electron');
 
@@ -17,8 +19,12 @@ const userRecords = computed(() => store.state.records)
 
 const outputName = ref('')
 
-const editVideo = (path: any, records: any, output: any) => 
-    generateFormat(path, records, output) 
+const editVideo = (path: any, records: any, merge: any, output: any) => {
+    if (merge?.start == undefined || merge?.end == undefined)
+        ffmpegCutVideo(path, records, output)
+    else
+        ffmpegMergeVideo(path, records, merge, output) 
+}
 
 const getOutputNameAndStartEdition = () => {
   ipcRenderer.send('application:download')
@@ -27,7 +33,12 @@ const getOutputNameAndStartEdition = () => {
     outputName.value = file.filePath + '.mp4'
 
     if (outputName.value.length != 0) {
-        editVideo(store.state.videoPath, userRecords.value, outputName.value)
+        editVideo(
+           store.state.videoPath, 
+           userRecords.value, 
+           store.state.mergeVideo.mergeVideos,  
+           outputName.value
+        )
         store.commit('nameOfOutput', outputName.value)
         router.push('/editing')
     }
@@ -38,7 +49,6 @@ const getOutputNameAndStartEdition = () => {
 
 <template>
     <div class="wrap-nav">
-
         <div class="add-file">
             <div class="wrap-logo">
                 <div class="img-brand">

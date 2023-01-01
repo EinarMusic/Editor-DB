@@ -1,12 +1,14 @@
 import { createStore } from 'vuex'
 
 import darkMode from './modules/darkMode'
+import mergeVideo from './modules/mergeVideo'
 import recordsTable from './modules/recordsTable'
 
 export default createStore({
     strict: true,
     modules: {
         darkMode,
+        mergeVideo,
         recordsTable
     },
     state: {

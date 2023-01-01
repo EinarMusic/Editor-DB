@@ -1,6 +1,26 @@
 <script setup lang="ts">
 import BaseInput from "../components/BaseInput.vue"
 
+import { useStore } from 'vuex'
+const { ipcRenderer } = require('electron');
+
+const store = useStore()
+
+const addStartVideo = () => {
+  ipcRenderer.send('file-request')
+
+  ipcRenderer.on('file', async (event, file) => {
+    store.commit('mergeVideo/addStartVideoPath', file) 
+  });
+}
+
+const addEndVideo = () => {
+  ipcRenderer.send('file-request')
+
+  ipcRenderer.on('file', async (event, file) => {
+    store.commit('mergeVideo/addEndVideoPath', file) 
+  });
+}
 </script>
 
 <template>
@@ -16,7 +36,7 @@ import BaseInput from "../components/BaseInput.vue"
                         inputPadding="0 0 0 20px"
                         :videoType="true"
                     />
-                    <span>Start</span>
+                    <span @click="addStartVideo()">Start</span>...
                 </div>
                 <div class="merge-end">
                     <BaseInput 
@@ -26,7 +46,7 @@ import BaseInput from "../components/BaseInput.vue"
                         inputPadding="0 0 0 20px"
                         :videoType="true"
                     />
-                    <span>End</span>
+                    <span @click="addEndVideo()">End</span>
                 </div>
             </div>
         </div>
