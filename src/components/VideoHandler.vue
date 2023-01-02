@@ -5,8 +5,8 @@ import avanceIcon from './icon/avanceIcon.vue'
 import regressIcon from './icon/regressIcon.vue'
 import cutIcon from './icon/cutIcon.vue'
 import speedIcon from './icon/speedIcon.vue'
-import togglerIcon from './icon/togglerIcon.vue'
-import controlsIcon from './icon/controlsIcon.vue'
+
+import ControlEditingStyle from './ControlEditingStyle.vue'
 
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
@@ -159,20 +159,16 @@ document.addEventListener('keyup', (event) => {
                     </span>
                 </div>
             </div>
-
-            <div class="nav-toggler" v-if="!store.state.screenSize">
-                <div @click="screenSize(), startDarkMode()">
-                    <togglerIcon 
-                        :mode="mode ? colorMode : 'black'" 
-                        togglerWidth="40px" 
-                    />
-                </div>
-                <div @click="$emit('controlsHiddenEvent')">
-                    <controlsIcon 
-                        :mode="mode ? colorMode : 'black'" 
-                        togglerWidth="40px" 
-                    />
-                </div>
+            <div class="control-editing-style">
+                <ControlEditingStyle v-if="!store.state.screenSize"
+                v-on:controlsHiddenEvent="$emit('controlsHiddenEvent')"
+                v-on:screenSize="screenSize"
+                v-on:startDarkMode="startDarkMode"
+                :mode="mode"
+                :colorMode="colorMode"
+                togglerSize="40px"
+                controlSize="25px"
+                />
             </div>
         </div>
     </div>
@@ -186,8 +182,6 @@ document.addEventListener('keyup', (event) => {
     justify-items: end;
 
     width: 100%;
-
-    padding-top: 5px;
 }
 .video-time, .console-video, .wrap-cut {
     width: 100%;
@@ -250,23 +244,13 @@ document.addEventListener('keyup', (event) => {
 .cut-time span {
     color: rgb(187, 19, 19);
 }
-.nav-toggler {
+
+.control-editing-style {
     display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.nav-toggler div {
-    display: flex;
-    justify-content: center;
+    justify-content: end;
     align-items: center;
 
-    height: 45px;
-    width: 45px;
-
-    border-radius: 50%;
-    cursor: pointer;
-
-    margin-left: 10px;
+    margin-top: 1px;
 }
 
 /*  dark */

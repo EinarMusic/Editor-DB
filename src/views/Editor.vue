@@ -2,6 +2,7 @@
 import BreakVideo from "../components/BreakVideo.vue"
 import RecordsOfCuts from "../components/RecordsOfCuts.vue"
 import VideoPlayer from "../components/VideoPlayer.vue"
+import ControlEditingStyle from "../components/ControlEditingStyle.vue"
 
 import BaseInput from "../components/BaseInput.vue"
 import BaseButton from "../components/BaseButton.vue"
@@ -44,15 +45,16 @@ const romeveCut = (cut: any) =>
 <template>
     <div class="wrap-all" :style="{ background: mode ? 'black' : 'white'}">
         <div class="video-player">
-            <div class="handler-style-control" v-if="store.state.screenSize">
-                <div class="nav-toggler">
-                    <div @click="screenSize(), startDarkMode()" class="wrap-toggler-btn">
-                        <togglerIcon togglerWidth="40px" />
-                    </div>
-                </div>
-                <div @click="controlsHidden = !controlsHidden" class="wrap-control-btn">
-                    <controlsIcon />
-                </div>
+            <div class="header-control-editing-style">
+                <ControlEditingStyle
+                    v-if="store.state.screenSize"
+                    v-on:controlsHiddenEvent="controlsHidden = !controlsHidden"
+                    v-on:screenSize="screenSize"
+                    v-on:startDarkMode="startDarkMode"
+                    spaceBetween="space-between"
+                    togglerSize="45px"
+                    controlSize="25px"
+                />
             </div>
             <VideoPlayer 
                 :controlsHidden="controlsHidden" 
@@ -60,8 +62,9 @@ const romeveCut = (cut: any) =>
             />
         </div>
         <div class="wrap-editor">
-            <div class="wrap-break-video" v-if="controlsHidden">
-                <BreakVideo>
+            <div class="wrap-break-video" v-if="controlsHidden" >
+                <span></span>
+                <BreakVideo style="justify-content: center">
                     <template #first>
                         <BaseInput 
                             v-model:userInput="userStartCut" 
@@ -87,13 +90,17 @@ const romeveCut = (cut: any) =>
                         </BaseButton>
                     </template>
                 </BreakVideo>
-                <div class="nav-toggler" v-if="!store.state.screenSize">
-                    <div @click="screenSize(), startDarkMode()">
-                        <togglerIcon :mode="mode ? colorMode : 'black'"  togglerWidth="40px" />
-                    </div>
-                    <div @click="controlsHidden = !controlsHidden">
-                        <controlsIcon :mode="mode ? colorMode : 'black'"  togglerWidth="40px" />
-                    </div>
+                <div class="control-editing-style">
+                    <ControlEditingStyle
+                        v-if="!store.state.screenSize"
+                        v-on:controlsHiddenEvent="controlsHidden = !controlsHidden"
+                        v-on:screenSize="screenSize"
+                        v-on:startDarkMode="startDarkMode"
+                        :mode="mode"
+                        :colorMode="colorMode"
+                        togglerSize="40px"
+                        controlSize="25px"
+                    />
                 </div>
             </div>
             <div class="records-content">
@@ -120,27 +127,21 @@ const romeveCut = (cut: any) =>
 <style scoped>
 .wrap-all {
     background: white;
-    /* background: black; */
 }
 .wrap-editor {
     display: flex;
     flex-direction: column;
     align-items: center;
-
+    justify-content: center;
 }
-.wrap-break-video {
-    margin-top: 5px;
-
+.wrap-break-video { 
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+
 
     width: 100%;
-}
-.nav-toggler {
-    flex: 1;
-
-    margin-right: 25px;
+    height: 57px;
 }
 .handler-style-control {
     display: flex;
@@ -179,18 +180,9 @@ const romeveCut = (cut: any) =>
 
     margin-top: 10px;
 }
-.nav-toggler div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    cursor: pointer;
-}
-
 .wrap-control-btn {
     margin-right: 15px;
 }
-
 .wrap-control-btn, .wrap-toggler-btn {
     display: flex;
     justify-content: center;
@@ -201,20 +193,12 @@ const romeveCut = (cut: any) =>
 
     cursor: pointer;
 }
-.nav-toggler {
-    display: flex;
-}
-.nav-toggler div {
+.control-editing-style {
     display: flex;
     justify-content: center;
     align-items: center;
-
-    height: 45px;
-    width: 45px;
-
-    border-radius: 50%;
-    cursor: pointer;
-
-    margin-left: 10px;
+}
+.header-control-editing-style {
+    padding-right: 27px;
 }
 </style>

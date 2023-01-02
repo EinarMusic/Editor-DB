@@ -1,5 +1,5 @@
 <template>
-    <div class="wrap-break-video">
+    <div class="wrap-break-v">
         <div class="add-cut">
             <div class="input">
                 <slot name="first"></slot>
